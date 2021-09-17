@@ -1,20 +1,63 @@
-import React from "react";
+import axios from "axios";
+import React, {useState} from "react";
 
-const Login = () => {
+ const initialState = {
+   username: '',
+   password: ''
+ }
+ 
+const Login = (props) => {
+  const [error , setError] = useState('');
+  const [log, setLog] = useState(initialState);
+
+ const handleSubmit = () => {
+    axios.post('http://localhost:5000/api/login', log)
+      .then(res => {
+        localStorage.setItem("token", res.data.payload);
+        localStorage.setItem("username", log.username);
+        props.history.push('/colors')
+  })
+      .catch(err => {
+        console.error(err);
+        setError(err);
+      })
+
+ }
+ const handleChange = e => {
+  setLog({
+          ...log,
+          [e.target.name]: e.target.value
+  });
+};
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
 
-  const error = "";
+  
   //replace with error state
 
   return (
     <div>
       <h1>Welcome to the Bubble App!</h1>
       <div data-testid="loginForm" className="login-form">
-        <h2>Build login form here</h2>
+        <form onSubmit={handleSubmit} id="submit">
+          <input
+            type="text"
+            name='username'
+            id="username"
+            value={log.username}
+            onChange={handleChange}
+          />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            value={log.password}
+            onChange={handleChange}
+          />
+          <button>Log In</button>
+        </form>
       </div>
-
-      <p id="error" className="error">{error}</p>
+      {log.username || log.password === false ?<p id="error" className="error">{error}</p>: <div></div>}
     </div>
   );
 };
